@@ -4,13 +4,13 @@ Short checklist derived from [Plan.md](./Plan.md). The first milestone is a manu
 
 ## Phase 1: Foundation & Manual Ticketing Core
 
-- [ ] Create migrations: `settings`, `users` (add `reports_to_id`, `role`), `tickets`, `comments`, `ticket_activities`
-- [ ] Add the `settings` model and seed defaults for the MVP keys (retention, reopen and auto-close window)
-- [ ] Store attachments on the local private disk (`FILESYSTEM_DISK=local`), not publicly reachable
-- [ ] Set up `en` and `ar` locales (`lang/en`, `lang/ar`) using Laravel's built-in translation only
-- [ ] Add the session-based language switcher (`POST /admin/language`, `filament_locale` session key, `SetFilamentLocale` middleware) in the user menu and on the login page
-- [ ] Enable RTL layout for `ar`
-- [ ] Verify exit criteria: both locales render, switcher persists across pages, all text stored as UTF-8
+- [x] Create migrations: `settings`, `users` (add `reports_to_id`, `role`), `tickets`, `comments`, `ticket_activities`
+- [x] Add the `settings` model and seed defaults for the MVP keys (retention, reopen and auto-close window)
+- [x] Store attachments on the local private disk (`FILESYSTEM_DISK=local`), not publicly reachable
+- [x] Set up `en` and `ar` locales (`lang/en`, `lang/ar`) using Laravel's built-in translation only
+- [x] Add the session-based language switcher (`POST /admin/language`, `filament_locale` session key, `SetFilamentLocale` middleware) in the user menu and on the login page
+- [x] Enable RTL layout for `ar`
+- [x] Verify exit criteria: both locales render, switcher persists across pages, all text stored as UTF-8
 
 ## Phase 2: Filament Admin & Workflow
 
