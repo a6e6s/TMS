@@ -5,6 +5,14 @@ return [
     'plural' => 'Tickets',
     'navigation_label' => 'Tickets',
 
+    'tabs' => [
+        'all' => 'All',
+        'unassigned' => 'Unassigned',
+        'open' => 'Open',
+        'in_progress' => 'In progress',
+        'resolved' => 'Resolved',
+    ],
+
     'sections' => [
         'details' => 'Ticket details',
         'reporter' => 'Reporter',

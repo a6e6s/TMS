@@ -12,7 +12,7 @@ class Setting extends Model
     {
         $value = self::query()->where('key', $key)->value('value');
 
-        return $value ?? config('tms.settings.'.$key, $default);
+        return $value ?? config('tms.settings')[$key] ?? $default;
     }
 
     public static function put(string $key, mixed $value): void

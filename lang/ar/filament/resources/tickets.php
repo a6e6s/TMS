@@ -5,6 +5,14 @@ return [
     'plural' => 'التذاكر',
     'navigation_label' => 'التذاكر',
 
+    'tabs' => [
+        'all' => 'الكل',
+        'unassigned' => 'غير مكلَّفة',
+        'open' => 'مفتوحة',
+        'in_progress' => 'قيد العمل',
+        'resolved' => 'تم حلها',
+    ],
+
     'sections' => [
         'details' => 'تفاصيل التذكرة',
         'reporter' => 'المُبلِّغ',

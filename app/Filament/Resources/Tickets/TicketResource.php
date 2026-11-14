@@ -12,6 +12,7 @@ use App\Filament\Resources\Tickets\Schemas\TicketForm;
 use App\Filament\Resources\Tickets\Schemas\TicketInfolist;
 use App\Filament\Resources\Tickets\Tables\TicketsTable;
 use App\Models\Ticket;
+use App\Models\User;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -69,6 +70,20 @@ class TicketResource extends Resource
             CommentsRelationManager::class,
             ActivitiesRelationManager::class,
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $user = auth()->user();
+
+        if (! $user instanceof User) {
+            return parent::getEloquentQuery()->whereRaw('1 = 0');
+        }
+
+        return parent::getEloquentQuery()->whereIn(
+            'tickets.id',
+            Ticket::query()->visibleTo($user)->select('tickets.id'),
+        );
     }
 
     public static function getPages(): array

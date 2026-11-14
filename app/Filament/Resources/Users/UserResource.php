@@ -18,7 +18,29 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
+
+    protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getModelLabel(): string
+    {
+        return __('filament/resources/users.model');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament/resources/users.plural');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('filament/resources/users.navigation_label');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament/common.navigation_groups.administration');
+    }
 
     public static function form(Schema $schema): Schema
     {

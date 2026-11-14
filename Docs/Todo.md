@@ -14,12 +14,12 @@ Short checklist derived from [Plan.md](./Plan.md). The first milestone is a manu
 
 ## Phase 2: Filament Admin & Workflow
 
-- [ ] Build Filament resources: `TicketResource` (filter tabs: All, Unassigned, Open, In Progress, Resolved), `UserResource`
-- [ ] Build the Settings page for the MVP `settings` values
-- [ ] Add manual priority, assignment, and status transitions (write `ticket_activities`)
-- [ ] Add internal and public comments (internal notes hidden from clients)
-- [ ] Implement role checks for `Super Admin`, `Team Lead`, and `Support Agent` with Filament policies (`role` column; revisit Spatie in Phase 3)
-- [ ] Verify exit criteria: role-based visibility is tested, every status change, assignment, and priority change writes an activity row
+- [x] Build Filament resources: `TicketResource` (filter tabs: All, Unassigned, Open, In Progress, Resolved), `UserResource`
+- [x] Build the Settings page for the MVP `settings` values
+- [x] Add manual priority, assignment, and status transitions (write `ticket_activities`)
+- [x] Add internal and public comments (internal notes hidden from clients)
+- [x] Implement role checks for `Super Admin`, `Team Lead`, and `Support Agent` with Filament policies (`role` column; revisit Spatie in Phase 3)
+- [x] Verify exit criteria: role-based visibility is tested, every status change, assignment, and priority change writes an activity row
 
 ## Phase 3 (Deferred): Production API & PMS Bridge
 

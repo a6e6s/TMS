@@ -8,6 +8,7 @@ use App\Enums\TicketStatus;
 use App\Enums\UserRole;
 use Database\Factories\TicketFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -125,6 +126,31 @@ class Ticket extends Model
     public function activities(): HasMany
     {
         return $this->hasMany(TicketActivity::class)->latest('created_at');
+    }
+
+    /**
+     * Super Admins see everything. Team Leads see their own tickets, their direct reports' tickets,
+     * and unassigned tickets. Support Agents see their own tickets and unassigned tickets.
+     *
+     * @param  Builder<Ticket>  $query
+     * @return Builder<Ticket>
+     */
+    public function scopeVisibleTo(Builder $query, User $user): Builder
+    {
+        if ($user->role === UserRole::SuperAdmin) {
+            return $query;
+        }
+
+        $visibleAssigneeIds = [$user->id];
+
+        if ($user->role === UserRole::TeamLead) {
+            $visibleAssigneeIds = [...$visibleAssigneeIds, ...$user->reports()->pluck('id')->all()];
+        }
+
+        return $query->where(function (Builder $visible) use ($visibleAssigneeIds): void {
+            $visible->whereNull('assigned_to_id')
+                ->orWhereIn('assigned_to_id', $visibleAssigneeIds);
+        });
     }
 
     private static function generateTicketNumber(): string
