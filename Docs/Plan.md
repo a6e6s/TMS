@@ -274,7 +274,7 @@ All external requests must include `Authorization: Bearer <tenant_api_token>` an
     "browser": "Safari 18.1",
     "os": "macOS 15.1",
     "viewport": "1440x900",
-    "console_errors": ["TypeError: undefined is not an object"]
+    "console_errors": ["TypeError: undefined is not an object (evaluating 'cart.submit')"]
   },
   "screenshots": [
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
@@ -379,7 +379,7 @@ All external requests must include `Authorization: Bearer <tenant_api_token>` an
 
 | Area | Target (proposed) |
 | --- | --- |
-| Ingestion latency | p95 under 300 ms for the `202` response |
+| Ingestion latency | p95 under 300 ms for the `202` response (screenshot decoding is async) |
 | Queue latency | p95 job start under 60 s |
 | Availability | 99.5% for the ingestion API (MVP) |
 | Burst capacity | 50 tickets per minute per tenant without queue backlog over 5 minutes |
