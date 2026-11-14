@@ -13,7 +13,6 @@ use App\Models\User;
 use Livewire\Livewire;
 
 use function Pest\Laravel\actingAs;
-use function Pest\Laravel\assertDatabaseHas;
 
 it('lets super admins create staff with a role and reporting line', function () {
     $manager = User::factory()->teamLead()->create();
@@ -30,11 +29,10 @@ it('lets super admins create staff with a role and reporting line', function () 
         ->call('create')
         ->assertHasNoFormErrors();
 
-    assertDatabaseHas(User::class, [
-        'email' => 'agent@example.com',
-        'role' => 'support_agent',
-        'reports_to_id' => $manager->id,
-    ]);
+    $created = User::query()->where('email', 'agent@example.com')->firstOrFail();
+
+    expect($created->isRole(UserRole::SupportAgent))->toBeTrue()
+        ->and($created->reports_to_id)->toBe($manager->id);
 });
 
 it('forbids team leads from creating staff', function () {

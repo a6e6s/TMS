@@ -5,6 +5,7 @@ namespace Database\Factories;
 namespace Database\Factories;
 
 use App\Enums\UserRole;
+use App\Enums\UserType;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -33,18 +34,30 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
-            'role' => UserRole::SupportAgent,
+            'user_type' => UserType::Staff,
         ];
+    }
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function (User $user): void {
+            $user->syncRoles([UserRole::SupportAgent->value]);
+        });
     }
 
     public function superAdmin(): static
     {
-        return $this->state(fn (array $attributes) => ['role' => UserRole::SuperAdmin]);
+        return $this->afterCreating(fn (User $user) => $user->syncRoles([UserRole::SuperAdmin->value]));
     }
 
     public function teamLead(): static
     {
-        return $this->state(fn (array $attributes) => ['role' => UserRole::TeamLead]);
+        return $this->afterCreating(fn (User $user) => $user->syncRoles([UserRole::TeamLead->value]));
+    }
+
+    public function serviceAccount(): static
+    {
+        return $this->state(fn (array $attributes) => ['user_type' => UserType::Service]);
     }
 
     /**

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Tickets\RelationManagers;
 
+use App\Enums\CommentAuthorType;
+use App\Models\Comment;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -67,9 +69,13 @@ class CommentsRelationManager extends RelationManager
                     ->label(__('filament/resources/tickets.comments.fields.body'))
                     ->limit(120)
                     ->wrap(),
-                TextColumn::make('author.name')
+                TextColumn::make('author_label')
                     ->label(__('filament/resources/tickets.comments.fields.author'))
-                    ->placeholder('—'),
+                    ->state(fn (Comment $record): string => match ($record->author_type) {
+                        CommentAuthorType::Client => __('filament/resources/tickets.comments.authors.reporter'),
+                        CommentAuthorType::System => __('filament/resources/tickets.comments.authors.system'),
+                        default => $record->author_id === null ? '—' : $record->author->name,
+                    }),
                 TextColumn::make('created_at')
                     ->label(__('filament/resources/tickets.fields.created_at'))
                     ->dateTime(),
@@ -78,6 +84,7 @@ class CommentsRelationManager extends RelationManager
                 CreateAction::make()
                     ->mutateDataUsing(function (array $data): array {
                         $data['author_id'] = auth()->id();
+                        $data['author_type'] = CommentAuthorType::Staff->value;
 
                         return $data;
                     }),

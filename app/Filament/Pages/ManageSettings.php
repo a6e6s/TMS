@@ -13,6 +13,7 @@ use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Facades\Crypt;
 
 class ManageSettings extends Page
 {
@@ -55,6 +56,16 @@ class ManageSettings extends Page
                             ->required(),
                     ])
                     ->columns(2),
+                Section::make(__('filament/pages/settings.sections.pms'))
+                    ->schema([
+                        TextInput::make('pms_webhook_secret')
+                            ->label(__('filament/pages/settings.fields.pms_webhook_secret'))
+                            ->helperText(__('filament/pages/settings.help.pms_webhook_secret'))
+                            ->password()
+                            ->revealable(false)
+                            ->dehydrated(fn (?string $state): bool => filled($state))
+                            ->maxLength(255),
+                    ]),
             ])
             ->statePath('data');
     }
@@ -65,6 +76,13 @@ class ManageSettings extends Page
 
         Setting::put('ticket.auto_close_days', $state['auto_close_days']);
         Setting::put('retention.days', $state['retention_days']);
+
+        if (filled($state['pms_webhook_secret'] ?? null)) {
+            Setting::put(
+                'pms.webhook_secret.'.config('pms.default_provider'),
+                Crypt::encryptString((string) $state['pms_webhook_secret']),
+            );
+        }
 
         Notification::make()
             ->title(__('filament/pages/settings.messages.saved'))
@@ -98,6 +116,6 @@ class ManageSettings extends Page
     {
         $user = auth()->user();
 
-        return $user instanceof User && $user->role === UserRole::SuperAdmin;
+        return $user instanceof User && $user->isRole(UserRole::SuperAdmin);
     }
 }

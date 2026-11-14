@@ -4,8 +4,10 @@ namespace App\Models;
 
 use App\Enums\TicketLocale;
 use App\Enums\TicketPriority;
+use App\Enums\TicketSource;
 use App\Enums\TicketStatus;
 use App\Enums\UserRole;
+use App\Jobs\SyncTicketChangeToPmsJob;
 use Database\Factories\TicketFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -30,9 +32,13 @@ use Illuminate\Validation\ValidationException;
     'reporter_name',
     'reporter_email',
     'locale',
+    'source',
+    'source_app_id',
+    'tracking_token_hash',
     'title',
     'description',
     'page_url',
+    'device_metadata',
     'attachments',
     'status',
     'priority',
@@ -88,6 +94,14 @@ class Ticket extends Model
                     ]);
                 }
             }
+
+            $staffChangedStatusOrPriority = auth()->check()
+                && (($ticket->wasChanged('status') && $ticket->status !== TicketStatus::PushedToPms)
+                    || $ticket->wasChanged('priority'));
+
+            if ($staffChangedStatusOrPriority && $ticket->projectSyncs()->exists()) {
+                SyncTicketChangeToPmsJob::dispatch($ticket->getKey());
+            }
         });
     }
 
@@ -100,8 +114,26 @@ class Ticket extends Model
             'status' => TicketStatus::class,
             'priority' => TicketPriority::class,
             'locale' => TicketLocale::class,
+            'source' => TicketSource::class,
+            'device_metadata' => 'array',
             'attachments' => 'array',
         ];
+    }
+
+    /**
+     * @return HasMany<ProjectSync, $this>
+     */
+    public function projectSyncs(): HasMany
+    {
+        return $this->hasMany(ProjectSync::class);
+    }
+
+    /**
+     * @return BelongsTo<SourceApp, $this>
+     */
+    public function sourceApp(): BelongsTo
+    {
+        return $this->belongsTo(SourceApp::class);
     }
 
     /**
@@ -137,13 +169,13 @@ class Ticket extends Model
      */
     public function scopeVisibleTo(Builder $query, User $user): Builder
     {
-        if ($user->role === UserRole::SuperAdmin) {
+        if ($user->isRole(UserRole::SuperAdmin)) {
             return $query;
         }
 
         $visibleAssigneeIds = [$user->id];
 
-        if ($user->role === UserRole::TeamLead) {
+        if ($user->isRole(UserRole::TeamLead)) {
             $visibleAssigneeIds = [...$visibleAssigneeIds, ...$user->reports()->pluck('id')->all()];
         }
 
@@ -151,6 +183,19 @@ class Ticket extends Model
             $visible->whereNull('assigned_to_id')
                 ->orWhereIn('assigned_to_id', $visibleAssigneeIds);
         });
+    }
+
+    /**
+     * Matches a ticket number only when the reporter's tracking token is correct.
+     *
+     * @param  Builder<Ticket>  $query
+     * @return Builder<Ticket>
+     */
+    public function scopeForTrackingToken(Builder $query, string $ticketNumber, ?string $trackingToken): Builder
+    {
+        return $query
+            ->where('ticket_number', $ticketNumber)
+            ->where('tracking_token_hash', hash('sha256', (string) $trackingToken));
     }
 
     private static function generateTicketNumber(): string
@@ -170,6 +215,6 @@ class Ticket extends Model
             return true;
         }
 
-        return in_array($actor->role, [UserRole::SuperAdmin, UserRole::TeamLead], true);
+        return $actor->isRole(UserRole::SuperAdmin) || $actor->isRole(UserRole::TeamLead);
     }
 }

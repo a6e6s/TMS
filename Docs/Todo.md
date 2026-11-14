@@ -21,23 +21,23 @@ Short checklist derived from [Plan.md](./Plan.md). The first milestone is a manu
 - [x] Implement role checks for `Super Admin`, `Team Lead`, and `Support Agent` with Filament policies (`role` column; revisit Spatie in Phase 3)
 - [x] Verify exit criteria: role-based visibility is tested, every status change, assignment, and priority change writes an activity row
 
-## Phase 3 (Deferred): Production API & PMS Bridge
+## Phase 3: Production API & PMS Bridge
 
-Start only after Phase 2 passes and Sanctum and Spatie installation is approved.
+Sanctum and Spatie were approved with the Phase 3 request.
 
-- [ ] Install `laravel/sanctum` and `spatie/laravel-permission` (approval required first)
-- [ ] Build `POST /api/v1/tickets` with Sanctum auth, `Idempotency-Key`, and payload limits (5 MB, 5 screenshots at 2 MB)
-- [ ] Create migrations: `webhook_payloads`, `project_syncs`
-- [ ] Scrub PII and secrets before saving `webhook_payloads`
-- [ ] Decode screenshots in `DecodeScreenshotsJob`
-- [ ] Build `SourceAppResource` for connected apps and their tokens
-- [ ] Choose the first PMS provider (open decision in Plan.md Section 6)
-- [ ] Implement `PmsConnectorInterface` and the provider connector with status mapping
-- [ ] Build `PushTicketToPmsJob` (5 tries, backoff: 1 min, 5 min, 30 min, 2 h, 12 h) and the **Push to PMS** action (guarded so a double click creates one `project_syncs` row)
-- [ ] Build the inbound PMS webhook `POST /api/v1/webhooks/pms/{provider}` with HMAC signature, 5-minute replay window, and `event_id` idempotency
-- [ ] Add client endpoints: `GET /api/v1/tickets/{ticket_number}` and `POST /api/v1/tickets/{ticket_number}/comments` (`X-Tracking-Token`)
-- [ ] Build the client portal (optional Filament/Blade)
-- [ ] Verify exit criteria: stale webhooks rejected, replayed events don't change state twice, all statuses mapped, failed syncs retry and show in Filament
+- [x] Install `laravel/sanctum` and `spatie/laravel-permission` (approval required first)
+- [x] Build `POST /api/v1/tickets` with Sanctum auth, `Idempotency-Key`, and payload limits (5 MB, 5 screenshots at 2 MB)
+- [x] Create migrations: `webhook_payloads`, `project_syncs`
+- [x] Scrub PII and secrets before saving `webhook_payloads`
+- [x] Decode screenshots in `DecodeScreenshotsJob`
+- [x] Build `SourceAppResource` for connected apps and their tokens
+- [x] Choose the first PMS provider (open decision in Plan.md Section 6): generic REST connector (`custom`) behind `PmsConnectorInterface`; vendor-specific connector pending the decision
+- [x] Implement `PmsConnectorInterface` and the provider connector with status mapping
+- [x] Build `PushTicketToPmsJob` (5 tries, backoff: 1 min, 5 min, 30 min, 2 h, 12 h) and the **Push to PMS** action (guarded so a double click creates one `project_syncs` row)
+- [x] Build the inbound PMS webhook `POST /api/v1/webhooks/pms/{provider}` with HMAC signature, 5-minute replay window, and `event_id` idempotency
+- [x] Add client endpoints: `GET /api/v1/tickets/{ticket_number}` and `POST /api/v1/tickets/{ticket_number}/comments` (`X-Tracking-Token`)
+- [ ] Build the client portal (optional Filament/Blade; not started, not required by the API)
+- [x] Verify exit criteria: stale webhooks rejected, replayed events don't change state twice, all statuses mapped, failed syncs retry and show in Filament
 
 ## Phase 4 (Deferred): AI Triage Engine
 
@@ -56,9 +56,10 @@ Start only after Phase 3 passes.
 - [ ] Structured JSON logs with `ticket_number` and `request_id`
 - [ ] Migrations each have a tested rollback
 
-## Cross-Cutting (Deferred to Phase 3 and 4)
+## Cross-Cutting (Phase 3 and 4)
 
-- [ ] Rate limiters: `ticket-ingestion` per source-app token, client endpoints per tracking token, public routes per IP
+- [x] Rate limiters: `ticket-ingestion` per source-app token, client endpoints per tracking token and per IP, public webhooks per IP
 - [ ] Structured JSON logs add `source_app_id`
-- [ ] Tests: endpoint feature tests, idempotency, webhook signature and replay, scrubber unit tests, job double-dispatch, connector contract fixtures, duplicate detection, AI shadow mode
+- [x] Tests: endpoint feature tests, idempotency, webhook signature and replay, scrubber unit tests, job double-dispatch, connector status mapping, Filament role and PMS action tests
+- [ ] Tests: duplicate detection and AI shadow mode (Phase 4, deferred)
 - [ ] Load test the ingestion endpoint before Phase 3 sign-off

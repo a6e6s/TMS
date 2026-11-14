@@ -30,17 +30,17 @@ class TicketPolicy
 
     public function delete(User $user, Ticket $ticket): bool
     {
-        return $user->role === UserRole::SuperAdmin;
+        return $user->isRole(UserRole::SuperAdmin);
     }
 
     public function restore(User $user, Ticket $ticket): bool
     {
-        return $user->role === UserRole::SuperAdmin;
+        return $user->isRole(UserRole::SuperAdmin);
     }
 
     public function forceDelete(User $user, Ticket $ticket): bool
     {
-        return $user->role === UserRole::SuperAdmin;
+        return $user->isRole(UserRole::SuperAdmin);
     }
 
     private function isVisibleTo(User $user, Ticket $ticket): bool

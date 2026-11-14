@@ -59,6 +59,21 @@ class TicketInfolist
                                 ->placeholder('—'),
                         ]),
                     ]),
+                Section::make(__('filament/resources/tickets.sections.pms'))
+                    ->schema([
+                        Grid::make(2)->schema([
+                            TextEntry::make('pms_sync_status')
+                                ->label(__('filament/resources/tickets.fields.pms_sync_status'))
+                                ->state(fn (Ticket $record): ?string => $record->projectSyncs->first()?->sync_status->getLabel())
+                                ->badge()
+                                ->placeholder('—'),
+                            TextEntry::make('pms_last_error')
+                                ->label(__('filament/resources/tickets.fields.pms_last_error'))
+                                ->state(fn (Ticket $record): ?string => $record->projectSyncs->first()?->last_error)
+                                ->placeholder('—'),
+                        ]),
+                    ])
+                    ->visible(fn (Ticket $record): bool => $record->projectSyncs->isNotEmpty()),
                 Section::make(__('filament/resources/tickets.sections.timeline'))
                     ->schema([
                         Grid::make(2)->schema([

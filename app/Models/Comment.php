@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\CommentAuthorType;
+use App\Jobs\SyncTicketChangeToPmsJob;
 use Database\Factories\CommentFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -9,11 +11,31 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['ticket_id', 'parent_id', 'author_id', 'body', 'is_internal', 'attachments'])]
+/**
+ * @property int $id
+ * @property int $ticket_id
+ * @property int|null $author_id
+ * @property CommentAuthorType $author_type
+ * @property bool $is_internal
+ */
+#[Fillable(['ticket_id', 'parent_id', 'author_id', 'author_type', 'body', 'is_internal', 'attachments'])]
 class Comment extends Model
 {
     /** @use HasFactory<CommentFactory> */
     use HasFactory;
+
+    protected static function booted(): void
+    {
+        static::created(function (Comment $comment): void {
+            if ($comment->is_internal || $comment->author_type === CommentAuthorType::System) {
+                return;
+            }
+
+            if ($comment->ticket->projectSyncs()->exists()) {
+                SyncTicketChangeToPmsJob::dispatch($comment->ticket_id, $comment->getKey());
+            }
+        });
+    }
 
     /**
      * @return array<string, string>
@@ -22,6 +44,7 @@ class Comment extends Model
     {
         return [
             'is_internal' => 'boolean',
+            'author_type' => CommentAuthorType::class,
             'attachments' => 'array',
         ];
     }

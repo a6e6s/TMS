@@ -48,7 +48,10 @@ class UserForm
                             Select::make('role')
                                 ->label(__('filament/resources/users.fields.role'))
                                 ->options(UserRole::class)
-                                ->default(UserRole::SupportAgent)
+                                ->default(UserRole::SupportAgent->value)
+                                ->afterStateHydrated(function (Select $component, ?User $record): void {
+                                    $component->state($record?->getRoleNames()->first() ?? UserRole::SupportAgent->value);
+                                })
                                 ->required(),
                             Select::make('reports_to_id')
                                 ->label(__('filament/resources/users.fields.reports_to'))

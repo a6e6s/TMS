@@ -18,9 +18,12 @@ return [
         'reporter' => 'المُبلِّغ',
         'triage' => 'الفرز',
         'timeline' => 'الجدول الزمني',
+        'pms' => 'نظام المشاريع',
     ],
 
     'fields' => [
+        'pms_sync_status' => 'حالة المزامنة مع نظام المشاريع',
+        'pms_last_error' => 'آخر خطأ في نظام المشاريع',
         'ticket_number' => 'رقم التذكرة',
         'title' => 'العنوان',
         'description' => 'الوصف',
@@ -44,8 +47,12 @@ return [
     ],
 
     'comments' => [
-        'title' => 'التعليقات',
-        'internal_help' => 'الملاحظات الداخلية مرئية للفريق فقط، ولا تظهر للمُبلِّغ أبدًا.',
+        'title' => 'Comments',
+        'internal_help' => 'Internal notes are visible only to staff and are never shown to the reporter.',
+        'authors' => [
+            'reporter' => 'المُبلِّغ',
+            'system' => 'النظام',
+        ],
         'fields' => [
             'body' => 'الرسالة',
             'is_internal' => 'ملاحظة داخلية',
@@ -54,8 +61,14 @@ return [
         ],
     ],
 
+    'pms' => [
+        'push_action' => 'إرسال إلى نظام المشاريع',
+        'queued' => 'تمت جدولة الإرسال إلى نظام المشاريع.',
+        'completed' => 'أكمل فريق التطوير المهمة.',
+        'cancelled' => 'أغلق فريق التطوير هذا الطلب بوصفه ملغى.',
+    ],
+
     'activities' => [
-        'title' => 'سجل النشاط',
         'system' => 'النظام',
         'change' => 'من :from إلى :to',
         'fields' => [

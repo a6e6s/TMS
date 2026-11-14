@@ -3,12 +3,14 @@
 namespace App\Filament\Resources\Users\Tables;
 
 use App\Enums\UserRole;
+use App\Models\User;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class UsersTable
 {
@@ -25,6 +27,8 @@ class UsersTable
                     ->searchable(),
                 TextColumn::make('role')
                     ->label(__('filament/resources/users.fields.role'))
+                    ->state(fn (User $record): ?string => $record->getRoleNames()->first())
+                    ->formatStateUsing(fn (?string $state): ?string => UserRole::tryFrom($state ?? '')?->getLabel())
                     ->badge(),
                 TextColumn::make('reportsTo.name')
                     ->label(__('filament/resources/users.fields.reports_to'))
@@ -33,7 +37,10 @@ class UsersTable
             ->filters([
                 SelectFilter::make('role')
                     ->label(__('filament/resources/users.fields.role'))
-                    ->options(UserRole::class),
+                    ->options(UserRole::class)
+                    ->query(fn (Builder $query, array $data): Builder => filled($data['value'] ?? null)
+                        ? $query->whereHas('roles', fn (Builder $roles): Builder => $roles->where('name', $data['value']))
+                        : $query),
             ])
             ->recordActions([
                 EditAction::make(),

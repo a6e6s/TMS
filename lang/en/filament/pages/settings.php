@@ -5,14 +5,17 @@ return [
 
     'sections' => [
         'tickets' => 'Ticket settings',
+        'pms' => 'PMS integration',
     ],
 
     'fields' => [
+        'pms_webhook_secret' => 'PMS webhook secret',
         'auto_close_days' => 'Auto-close resolved tickets after (days)',
         'retention_days' => 'Retention period (days)',
     ],
 
     'help' => [
+        'pms_webhook_secret' => 'Stored encrypted. Leave blank to keep the current secret.',
         'auto_close_days' => 'Resolved tickets close automatically when they are not reopened within this many days.',
         'retention_days' => 'Stored intake payloads older than this are removed.',
     ],

@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\File;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\post;
@@ -52,4 +53,21 @@ it('ships matching English and Arabic keys for shared enums', function () {
     $arabic = array_keys(Arr::dot(require lang_path('ar/filament/enums.php')));
 
     expect($arabic)->toEqual($english);
+});
+
+it('keeps every Filament translation file in step between English and Arabic', function () {
+    $relativePaths = fn (string $locale): array => collect(File::allFiles(lang_path($locale.'/filament')))
+        ->map(fn (SplFileInfo $file): string => $file->getRelativePathname())
+        ->sort()
+        ->values()
+        ->all();
+
+    expect($relativePaths('ar'))->toEqual($relativePaths('en'));
+
+    foreach ($relativePaths('en') as $relativePath) {
+        $english = array_keys(Arr::dot(require lang_path('en/filament/'.$relativePath)));
+        $arabic = array_keys(Arr::dot(require lang_path('ar/filament/'.$relativePath)));
+
+        expect($arabic)->toEqual($english, "Arabic keys differ in {$relativePath}");
+    }
 });

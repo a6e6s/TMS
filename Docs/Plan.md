@@ -7,8 +7,7 @@ A centralized, single-tenant **Ticketing & Support** system built with **Laravel
 ### Core Objectives
 
 * **Manual Ticket Intake:** Agents create tickets in Filament from reports received by email, phone, or chat, including the page URL, reporter details, and screenshots stored on the local private disk.
-* **PMS Integration Bridge (Deferred, Phase 3):** Convert verified tickets into tasks in an external PMS and synchronize status both ways. Not part of the first milestone.
-* **Support Communication:** Agents post public replies (visible to the reporter) and internal notes (visible only to staff). Client API and portal access are deferred.
+* **PMS Integration Bridge (Phase 3):** Convert verified tickets into tasks in an external PMS and synchronize status both ways. Not part of the first milestone.* **Support Communication:** Agents post public replies (visible to the reporter) and internal notes (visible only to staff). Client API and portal access are deferred.
 * **Bilingual Interface (Arabic/English):** The admin panel, client portal, API error messages, and notification emails are available in English (`en`) and Arabic (`ar`). Arabic uses right-to-left (RTL) layout. Users switch language with an EN/عربي switcher, as in adms-gateway.
 * **Single-Tenant Scope:** One organization owns all tickets and settings. There are no tenant columns, which keeps the MVP simple.
 
@@ -23,8 +22,7 @@ A centralized, single-tenant **Ticketing & Support** system built with **Laravel
   * Pages set `lang` and `dir` from the active locale (`dir="rtl"` for `ar`).
   * Reporter locale comes from the `Accept-Language` header, defaulting to `en`. Ticket content is stored as written, so Arabic and English can mix in one ticket.
 * **Filament Administration Panel:** Role-based access (`Super Admin`, `Team Lead`, `Support Agent`) stored in a `role` column on `users` for the MVP (Spatie permissions wait for approval), hierarchical reporting (`reports_to`), manual ticket assignment, and manual priority.
-* **API Gateway (Deferred, Phase 3):** Sanctum-secured ticket ingestion (`POST /api/v1/tickets`), queued processing, and a raw payload audit log (`webhook_payloads`). Not built in the first milestone.
-* **AI Triage (Deferred, Phase 4):** Severity scoring, categorization, duplicate detection, and auto-escalation. Not built in the first milestone.
+* **API Gateway (Phase 3):** Sanctum-secured ticket ingestion (`POST /api/v1/tickets`), queued processing, and a raw payload audit log (`webhook_payloads`). Not built in the first milestone.* **AI Triage (Deferred, Phase 4):** Severity scoring, categorization, duplicate detection, and auto-escalation. Not built in the first milestone.
 
 
 ## 1. Implementation Plan
@@ -37,8 +35,7 @@ This phased roadmap starts with a manual ticketing system in Filament. The API, 
 | --- | --- | --- |
 | **Phase 1: Core Ticketing Foundation** | Schema, Filament Base & Localization | • Build migrations for `settings`, `users` (with `role`), `tickets`, `comments`, and `ticket_activities`.<br>• Build `TicketResource` with manual intake: title, description, reporter, page URL, and attachments on the local private disk.<br>• Set up the `en` and `ar` locales with the adms-gateway style switcher and RTL layout. |
 | **Phase 2: Agent Workflow & Roles** | Triage, Assignment & Communication | • Add the `role` column (`Super Admin`, `Team Lead`, `Support Agent`) and Filament policies.<br>• Build `UserResource`, the Settings page (general settings), and a ticket stats widget.<br>• Add manual priority, assignment, and status transitions, each writing a `ticket_activities` row.<br>• Add public replies and internal notes (`comments.is_internal`). |
-| **Phase 3 (Deferred): Production API & PMS Bridge** | Integration after the MVP | • Install `laravel/sanctum` and `spatie/laravel-permission` (approval required first).<br>• Build `POST /api/v1/tickets` with `Idempotency-Key`, payload limits, `webhook_payloads`, and `SourceAppResource`.<br>• Build `PmsConnectorInterface`, `PushTicketToPmsJob`, `project_syncs`, and the inbound PMS webhook.<br>• Add client endpoints and an optional client portal. |
-| **Phase 4 (Deferred): AI Triage** | Intelligent automation | • Add `ai_priority_score` and `ai_analysis`, `AiTriageService`, and duplicate detection.<br>• Add auto-escalation with shadow mode and a kill switch. |
+| **Phase 3: Production API & PMS Bridge** | Integration after the MVP | • Install `laravel/sanctum` and `spatie/laravel-permission` (approval required first).<br>• Build `POST /api/v1/tickets` with `Idempotency-Key`, payload limits, `webhook_payloads`, and `SourceAppResource`.<br>• Build `PmsConnectorInterface`, `PushTicketToPmsJob`, `project_syncs`, and the inbound PMS webhook.<br>• Add client endpoints and an optional client portal. || **Phase 4 (Deferred): AI Triage** | Intelligent automation | • Add `ai_priority_score` and `ai_analysis`, `AiTriageService`, and duplicate detection.<br>• Add auto-escalation with shadow mode and a kill switch. |
 
 
 ---
@@ -47,8 +44,7 @@ This phased roadmap starts with a manual ticketing system in Filament. The API, 
 
 * **Phase 1:** Tickets can be created, viewed, and edited in Filament. Switching between English and Arabic works, and Arabic renders RTL.
 * **Phase 2:** Agents see only the tickets their role allows (tested). Every status, priority, or assignment change writes a `ticket_activities` row. Internal notes never appear in public replies.
-* **Phase 3 (deferred):** `POST /api/v1/tickets` returns `202` within the latency target in Section 5. A repeated `Idempotency-Key` returns the original ticket. A PMS webhook with a stale timestamp is rejected, and a replayed `event_id` does not change state twice.
-* **Phase 4 (deferred):** Duplicate detection is active. Shadow-mode agreement between AI and manual priority is reviewed (`AiAccuracyChart`) before auto-escalation is enabled. The kill switch stops auto-push within one job cycle.
+* **Phase 3:** `POST /api/v1/tickets` returns `202` within the latency target in Section 5. A repeated `Idempotency-Key` returns the original ticket. A PMS webhook with a stale timestamp is rejected, and a replayed `event_id` does not change state twice.* **Phase 4 (deferred):** Duplicate detection is active. Shadow-mode agreement between AI and manual priority is reviewed (`AiAccuracyChart`) before auto-escalation is enabled. The kill switch stops auto-push within one job cycle.
 
 ---
 
@@ -62,7 +58,7 @@ This phased roadmap starts with a manual ticketing system in Filament. The API, 
 4. **Resolution (Agent):** When the work is done, the agent marks the ticket `resolved` and writes a public reply for the reporter. Reopening within 14 days is allowed (proposed).
 5. **Closure:** A resolved ticket closes automatically after 14 days (proposed), or earlier when an agent closes it. Team Leads can close spam or duplicates with an internal note.
 
-*Deferred (Phase 3):* PMS escalation and status webhooks. *Deferred (Phase 4):* AI scoring and auto-escalation.
+*Phase 3:* PMS escalation and status webhooks. *Deferred (Phase 4):* AI scoring and auto-escalation.
 
 ```
 open ──► triaged ──► in_progress ──► resolved ──► closed
@@ -86,11 +82,11 @@ open ──► triaged ──► in_progress ──► resolved ──► closed
 | `resolved` | `closed` | Agent, or automatically after 14 days (proposed) | |
 | Any open state | `closed` | Team Lead (spam or duplicate) | Requires an internal note |
 
-*Deferred (Phase 3):* `pushed_to_pms` status and PMS-driven transitions are added with the PMS bridge.
+*Phase 3:* `pushed_to_pms` status and PMS-driven transitions are added with the PMS bridge.
 
 Every transition writes a `ticket_activities` row. Invalid transitions are rejected with a validation error in Filament.
 
-#### PMS Status Mapping (Deferred, Phase 3)
+#### PMS Status Mapping (Phase 3)
 
 | PMS status category | Ticket status | Client-visible comment |
 | --- | --- | --- |
@@ -101,7 +97,7 @@ Every transition writes a `ticket_activities` row. Invalid transitions are rejec
 
 Unmapped PMS statuses are stored in `ticket_activities` and leave the ticket unchanged. Mappings are per provider and live in the connector class.
 
-#### Outbound Sync Rules (Deferred, Phase 3)
+#### Outbound Sync Rules (Phase 3)
 
 * Priority and status changes are written to the PMS task as field updates.
 * Public comments (`is_internal = false`) are posted to the PMS task. Internal notes are never sent.
@@ -173,8 +169,7 @@ erDiagram
 * `id` (bigint, PK), `assigned_to_id` (FK -> `users.id`, nullable), `ticket_number` (string, unique, e.g., `TCK-10042`), `reporter_name` (string, nullable), `reporter_email` (string, nullable, indexed), `locale` (enum: `en`, `ar`, default `en`; chosen by the agent at intake), `title` (string, max 255), `description` (text), `page_url` (text, nullable), `attachments` (json, nullable; paths on the local private disk), `status` (enum: `open`, `triaged`, `in_progress`, `resolved`, `closed`; `pushed_to_pms` is added in Phase 3), `priority` (enum: `low`, `medium`, `high`, `critical`, default `medium`), `timestamps`, `softDeletes`.
 
 
-**Deferred tables (Phase 3, API and PMS bridge):** Stores scrubbed incoming requests before parsing so failed payloads can be replayed from a Filament action.* `id` (bigint, PK), `ticket_id` (FK -> `tickets.id`, nullable), `source_ip` (string), `source` (enum: `client_api`, `pms_webhook`), `event_id` (string, nullable; unique per source, used for idempotency), `headers` (json; allow-listed headers only), `raw_payload` (json; scrubbed), `processing_status` (enum: `pending`, `processed`, `failed`, `duplicate`), `attempts` (unsignedTinyInteger, default `0`), `error_message` (text, nullable), `timestamps`.
-
+**Phase 3 tables (API and PMS bridge):** Stores scrubbed incoming requests before parsing so failed payloads can be replayed from a Filament action.* `id` (bigint, PK), `ticket_id` (FK -> `tickets.id`, nullable), `source_ip` (string), `source` (enum: `client_api`, `pms_webhook`), `event_id` (string, nullable; unique per source, used for idempotency), `headers` (json; allow-listed headers only), `raw_payload` (json; scrubbed), `processing_status` (enum: `pending`, `processed`, `failed`, `duplicate`), `attempts` (unsignedTinyInteger, default `0`), `error_message` (text, nullable), `timestamps`.
 
 * **`project_syncs` (PMS Task Mapping):** Links each ticket to at most one external task per PMS provider (unique index on `ticket_id` + `pms_provider`), which prevents duplicate task creation.
 * `id` (bigint, PK), `ticket_id` (FK -> `tickets.id`), `pms_provider` (string, e.g., `jira`, `clickup`, `linear`, `custom`), `external_task_id` (string, indexed), `external_task_url` (string), `sync_status` (enum: `synced`, `failed`, `out_of_sync`), `last_synced_at` (timestamp), `sync_attempts` (unsignedTinyInteger, default `0`), `last_error` (text, nullable), `timestamps`.
@@ -191,7 +186,7 @@ erDiagram
 
 ## 4. Technical Documentation
 
-### A. API Specification (Deferred to Phase 3; Sanctum Authenticated)
+### A. API Specification (Phase 3; Sanctum Authenticated)
 
 All external requests must include `Authorization: Bearer <tenant_api_token>` and `Accept: application/json`. Submission requests must also include a unique `Idempotency-Key` header (UUID v4 recommended). Payloads are capped at 5 MB, with at most 5 screenshots of 2 MB each (PNG, JPEG, or WebP).
 
@@ -276,7 +271,7 @@ All external requests must include `Authorization: Bearer <tenant_api_token>` an
 
 ### B. Laravel & Filament Architecture Blueprint
 
-#### 1. Service & Queue Pipeline (Deferred to Phases 3 and 4)
+#### 1. Service & Queue Pipeline (Phase 3; AI steps deferred to Phase 4)
 
 * **`IngestTicketAction`:** Runs inside a DB transaction. Checks the `Idempotency-Key`, stores a scrubbed copy of the payload in `webhook_payloads`, creates the `Ticket` with its tracking token, and dispatches `DecodeScreenshotsJob`, then `ProcessTicketPipelineJob`. `DecodeScreenshotsJob` validates the MIME type by content sniffing (not the data-URI prefix) and writes to the local private disk (`storage/app/private`), never the public disk. Decoding stays off the request path so the `202` response is fast.
 * **`ProcessTicketPipelineJob`:**
@@ -331,7 +326,7 @@ All external requests must include `Authorization: Bearer <tenant_api_token>` an
   * Activity log tests: every status change, assignment, and priority change writes one `ticket_activities` row.
   * Localization tests: every user-facing key exists in both `lang/en` and `lang/ar`, the switcher persists `filament_locale` in session, and the Arabic UI renders RTL.
   * Attachment tests: uploads are stored on the local private disk and are not publicly reachable.
-  * Deferred (Phase 3): ingestion idempotency, webhook signature and replay tests, scrubber fixtures, PMS job and connector contract tests, and an ingestion load test.
+  * Phase 3: ingestion idempotency, webhook signature and replay tests, scrubber fixtures, PMS job and connector tests, and an ingestion load test (not yet run).
   * Deferred (Phase 4): duplicate detection and AI shadow-mode tests.
 * **Deployment:** Every migration must have a tested rollback. Feature flags for auto-escalation and shadow mode are added in Phase 4.
 
@@ -341,8 +336,8 @@ All external requests must include `Authorization: Bearer <tenant_api_token>` an
 
 These need confirmation before the related phase starts:
 
-* **Staff role model (MVP):** Decided for now: a `role` column on `users`. Confirm whether Spatie permissions should replace it in Phase 3 (requires approval to install).
-* **Sanctum and Spatie installation:** Deferred. Both need approval before Phase 3 starts.
+* **Staff roles (Phase 3):** Spatie roles (`super_admin`, `team_lead`, `support_agent`) replaced the MVP `role` column. Existing roles are migrated into `model_has_roles`.
+* **Sanctum and Spatie (Phase 3):** Installed with the Phase 3 request.
 * **Screenshot storage:** Decided: local private disk for MVP. S3 is out of scope for now.
 * **Retention period:** 90 days proposed.
 * **Reopen and auto-close window:** 14 days proposed.

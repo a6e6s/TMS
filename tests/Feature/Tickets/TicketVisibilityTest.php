@@ -70,8 +70,8 @@ it('allows only super admins to delete tickets', function () {
     expect(auth()->user()->can('delete', $ticket))->toBeTrue();
 });
 
-it('stores the role as an enum', function () {
+it('assigns the Spatie super admin role', function () {
     $user = User::factory()->superAdmin()->create();
 
-    expect($user->refresh()->role)->toBe(UserRole::SuperAdmin);
+    expect($user->refresh()->isRole(UserRole::SuperAdmin))->toBeTrue();
 });

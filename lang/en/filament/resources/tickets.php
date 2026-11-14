@@ -18,9 +18,12 @@ return [
         'reporter' => 'Reporter',
         'triage' => 'Triage',
         'timeline' => 'Timeline',
+        'pms' => 'PMS',
     ],
 
     'fields' => [
+        'pms_sync_status' => 'PMS sync',
+        'pms_last_error' => 'Last PMS error',
         'ticket_number' => 'Ticket number',
         'title' => 'Title',
         'description' => 'Description',
@@ -46,6 +49,10 @@ return [
     'comments' => [
         'title' => 'Comments',
         'internal_help' => 'Internal notes are visible only to staff and are never shown to the reporter.',
+        'authors' => [
+            'reporter' => 'Reporter',
+            'system' => 'System',
+        ],
         'fields' => [
             'body' => 'Message',
             'is_internal' => 'Internal note',
@@ -54,8 +61,14 @@ return [
         ],
     ],
 
+    'pms' => [
+        'push_action' => 'Push to PMS',
+        'queued' => 'Push to PMS queued.',
+        'completed' => 'Engineering marked the task as completed.',
+        'cancelled' => 'Engineering closed this request as cancelled.',
+    ],
+
     'activities' => [
-        'title' => 'Activity',
         'system' => 'System',
         'change' => ':from → :to',
         'fields' => [
