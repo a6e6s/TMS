@@ -39,4 +39,19 @@ return [
 
     'locales' => ['en', 'ar'],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Seeded Super Admin
+    |--------------------------------------------------------------------------
+    |
+    | Account created by the database seeder. Set ADMIN_PASSWORD in .env
+    | before seeding anything other than a local development database.
+    |
+    */
+
+    'admin' => [
+        'email' => env('ADMIN_EMAIL', 'admin@example.com'),
+        'password' => env('ADMIN_PASSWORD', 'password'),
+    ],
+
 ];

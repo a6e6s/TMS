@@ -69,6 +69,7 @@ return [
     ],
 
     'activities' => [
+        'title' => 'Activity',
         'system' => 'System',
         'change' => ':from → :to',
         'fields' => [

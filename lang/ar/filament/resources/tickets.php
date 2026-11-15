@@ -47,7 +47,7 @@ return [
     ],
 
     'comments' => [
-        'title' => 'Comments',
+        'title' => 'التعليقات',
         'internal_help' => 'Internal notes are visible only to staff and are never shown to the reporter.',
         'authors' => [
             'reporter' => 'المُبلِّغ',
@@ -69,6 +69,7 @@ return [
     ],
 
     'activities' => [
+        'title' => 'سجل النشاط',
         'system' => 'النظام',
         'change' => 'من :from إلى :to',
         'fields' => [

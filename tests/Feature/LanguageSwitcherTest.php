@@ -71,3 +71,20 @@ it('keeps every Filament translation file in step between English and Arabic', f
         expect($arabic)->toEqual($english, "Arabic keys differ in {$relativePath}");
     }
 });
+
+it('resolves every literal filament translation key used in the app in both locales', function () {
+    $keys = collect(File::allFiles([app_path(), base_path('config')]))
+        ->filter(fn (SplFileInfo $file): bool => $file->getExtension() === 'php')
+        ->flatMap(fn (SplFileInfo $file): array => preg_match_all("/__\('(filament\/[^']+)'[,)]/", File::get($file->getPathname()), $matches)
+            ? $matches[1]
+            : [])
+        ->unique()
+        ->values();
+
+    expect($keys)->not->toBeEmpty();
+
+    foreach ($keys as $key) {
+        expect(__($key, [], 'en'))->not->toBe($key, "Missing English key {$key}");
+        expect(__($key, [], 'ar'))->not->toBe($key, "Missing Arabic key {$key}");
+    }
+});
