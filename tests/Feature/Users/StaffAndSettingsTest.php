@@ -6,6 +6,7 @@ use App\Filament\Pages\ManageSettings;
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
+use App\Filament\Resources\Users\UserResource;
 use App\Filament\Widgets\TicketStatsOverview;
 use App\Models\Setting;
 use App\Models\Ticket;
@@ -33,6 +34,14 @@ it('lets super admins create staff with a role and reporting line', function () 
 
     expect($created->isRole(UserRole::SupportAgent))->toBeTrue()
         ->and($created->reports_to_id)->toBe($manager->id);
+});
+
+it('hides service accounts from the staff list and their edit page', function () {
+    $service = User::factory()->serviceAccount()->create();
+    actingAs(User::factory()->superAdmin()->create());
+
+    expect(UserResource::getEloquentQuery()->whereKey($service->getKey())->exists())->toBeFalse();
+    expect(UserResource::getRecordRouteBindingEloquentQuery()->whereKey($service->getKey())->exists())->toBeFalse();
 });
 
 it('forbids team leads from creating staff', function () {

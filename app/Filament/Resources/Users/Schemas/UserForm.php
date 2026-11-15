@@ -50,7 +50,7 @@ class UserForm
                                 ->options(UserRole::class)
                                 ->default(UserRole::SupportAgent->value)
                                 ->afterStateHydrated(function (Select $component, ?User $record): void {
-                                    $component->state($record?->getRoleNames()->first() ?? UserRole::SupportAgent->value);
+                                    $component->state($record?->getRoleNames()->first());
                                 })
                                 ->required(),
                             Select::make('reports_to_id')
