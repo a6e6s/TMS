@@ -454,6 +454,14 @@
     box-shadow: 0 0 0 3px rgb(139 92 246 / 14%);
 }
 
+.tms-login-form .fi-input {
+    color: #1e1b4b;
+}
+
+.tms-login-form .fi-input::placeholder {
+    color: #8a82a8;
+}
+
 .tms-login-form .fi-btn {
     min-height: 3.2rem;
     font-size: 1rem;
