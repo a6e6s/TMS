@@ -11,15 +11,18 @@ Host web projects that run a Filament panel need a way to create a support ticke
 * **Filament:** v5 only (matches TMS `filament/filament ^5.0`).
 * **Languages:** `en` and `ar` with RTL, matching TMS.
 * **Form fields:** title (required), description (required), priority hint, page URL (auto-filled), reporter name and email, screenshots, and device metadata (auto-captured).
+* **Repository:** the package lives in its own folder and its own Git repository with a GitHub remote, separate from TMS.
+* **Panel selection:** opt-in per panel. Only panels that register `FilamentTicketsPlugin::make()` show the action. No per-panel source label on tickets.
+* **Tokens:** one SourceApp token per host project. No separate token per panel.
 
 ## Approach
 
-Build a Composer package in this repo at `packages/filament-tms-tickets`, with namespace `Tms\FilamentTickets\`. Host projects install it with a Composer `path` repository (or a VCS repository later). The package has no database tables.
+Build a Composer package in its own folder at `/home/a6e6s/Code/filament-tms-tickets`, with its own Git repository and GitHub remote, and namespace `Tms\FilamentTickets\`. Host projects install it with a Composer `vcs` repository (or a `path` repository during development). The package has no database tables.
 
 ### Key Files (Package)
 
 * `composer.json`: requires `filament/filament ^5.0`, `illuminate/support`, and `php ^8.3`. Auto-discovers the service provider.
-* `src/FilamentTicketsPlugin.php`: implements `Filament\Contracts\Plugin`. Registers the action in the panel's header. Each panel opts in with `->plugin(FilamentTicketsPlugin::make())`.
+* `src/FilamentTicketsPlugin.php`: implements `Filament\Contracts\Plugin`. Registers the action in the panel's header. Each panel opts in with `->plugins([FilamentTicketsPlugin::make()])`, so multi-panel projects such as `jit-hr` enable it only on chosen panels.
 * `src/Actions/CreateTicketAction.php`: Filament action with a modal form. Pre-fills `page_url` from the current request. Fills `device_metadata` from a small Alpine snippet (user agent, viewport, console errors buffered from `window.onerror`).
 * `src/Services/TmsTicketClient.php`: `Http::withToken()->acceptJson()->timeout()->post()`. Sends a UUID v4 `Idempotency-Key` per submission. Maps the 202 response to a `ticket_number` notification. Maps 422 to form field errors, and 401, 413, 429, and 5xx to user-facing messages.
 * `src/Services/ScreenshotEncoder.php`: converts uploaded files to `data:image/*;base64,` URIs. Enforces a limit of 5 files and 2 MB per file, and checks MIME type by content sniffing.
@@ -57,11 +60,12 @@ Build a Composer package in this repo at `packages/filament-tms-tickets`, with n
 
 * Whether the TMS already has a UI to issue `SourceApp` tokens. If not, the plan adds one.
 * Whether the package needs a header action or a user-menu action. The default is a header action.
+* GitHub repository visibility: created as private by default.
 * Package name and vendor namespace (`tms/filament-tickets` proposed).
 
 ## Implementation Todos
 
-1. Scaffold the `packages/filament-tms-tickets` package (composer.json, provider, plugin class, config).
+1. Scaffold the `filament-tms-tickets` package in `/home/a6e6s/Code/filament-tms-tickets` (composer.json, provider, plugin class, config).
 2. Build `TmsTicketClient` with idempotency keys and error mapping.
 3. Build `ScreenshotEncoder`.
 4. Build `CreateTicketAction` with the modal form and device metadata capture.
