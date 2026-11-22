@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\Pms\FlexFlowPmsConnector;
 use App\Services\Pms\GenericHttpPmsConnector;
 use App\Services\Pms\PmsConnectorInterface;
 use Carbon\CarbonImmutable;
@@ -20,7 +21,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(PmsConnectorInterface::class, GenericHttpPmsConnector::class);
+        $this->app->bind(PmsConnectorInterface::class, fn () => match (config('pms.default_provider')) {
+            'flexflow' => new FlexFlowPmsConnector,
+            default => new GenericHttpPmsConnector,
+        });
     }
 
     /**
