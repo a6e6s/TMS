@@ -47,6 +47,8 @@ class StoreTicketRequest extends FormRequest
             'reporter.name' => ['nullable', 'string', 'max:255'],
             'reporter.email' => ['nullable', 'email', 'max:255'],
             'device_metadata' => ['nullable', 'array'],
+            'device_metadata.user_agent' => ['nullable', 'string', 'max:1000'],
+            'device_metadata.viewport' => ['nullable', 'string', 'max:50'],
             'device_metadata.console_errors' => ['nullable', 'array', 'max:50'],
             'device_metadata.console_errors.*' => ['string'],
             'screenshots' => ['nullable', 'array', 'max:5'],

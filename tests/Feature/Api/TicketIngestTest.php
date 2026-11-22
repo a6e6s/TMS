@@ -66,6 +66,26 @@ it('creates a ticket and returns a one-time tracking token', function () {
         ->and($ticket->reporter_email)->toBe('sara@client.com');
 });
 
+it('keeps the reporter browser user agent and viewport on the ticket', function () {
+    Storage::fake('local');
+    [, $token] = sourceAppWithToken();
+
+    $response = postJson('/api/v1/tickets', ticketPayload([
+        'device_metadata' => ['user_agent' => 'Mozilla/5.0 (X11; Linux x86_64)', 'viewport' => '1440x900'],
+    ]), [
+        'Authorization' => 'Bearer '.$token,
+        'Idempotency-Key' => 'key-browser',
+    ]);
+
+    $response->assertAccepted();
+
+    $ticket = Ticket::query()->where('ticket_number', $response->json('ticket_number'))->firstOrFail();
+
+    expect($ticket->device_metadata)
+        ->toHaveKey('user_agent', 'Mozilla/5.0 (X11; Linux x86_64)')
+        ->toHaveKey('viewport', '1440x900');
+});
+
 it('returns the original ticket for a repeated Idempotency-Key without creating another', function () {
     Storage::fake('local');
     [, $token] = sourceAppWithToken();

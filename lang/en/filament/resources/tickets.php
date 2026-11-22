@@ -19,9 +19,14 @@ return [
         'triage' => 'Triage',
         'timeline' => 'Timeline',
         'pms' => 'PMS',
+        'browser' => 'Submitter browser',
+        'screenshots' => 'Screenshots (:count)',
     ],
 
     'fields' => [
+        'user_agent' => 'Browser',
+        'viewport' => 'Viewport',
+        'console_errors' => 'Console errors',
         'pms_sync_status' => 'PMS sync',
         'pms_last_error' => 'Last PMS error',
         'ticket_number' => 'Ticket number',
@@ -40,6 +45,10 @@ return [
     ],
 
     'unassigned' => 'Unassigned',
+    'no_console_errors' => 'No console errors were captured.',
+    'no_screenshots' => 'No screenshots were attached to this ticket.',
+    'screenshot_label' => 'Screenshot :number',
+    'open_full_size' => 'Open full size',
 
     'messages' => [
         'invalid_transition' => 'This status change is not allowed from the current status.',

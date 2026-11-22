@@ -19,9 +19,14 @@ return [
         'triage' => 'الفرز',
         'timeline' => 'الجدول الزمني',
         'pms' => 'نظام المشاريع',
+        'browser' => 'متصفح المُبلِّغ',
+        'screenshots' => 'لقطات الشاشة (:count)',
     ],
 
     'fields' => [
+        'user_agent' => 'المتصفح',
+        'viewport' => 'حجم نافذة العرض',
+        'console_errors' => 'أخطاء وحدة التحكم',
         'pms_sync_status' => 'حالة المزامنة مع نظام المشاريع',
         'pms_last_error' => 'آخر خطأ في نظام المشاريع',
         'ticket_number' => 'رقم التذكرة',
@@ -40,6 +45,10 @@ return [
     ],
 
     'unassigned' => 'غير مكلَّف',
+    'no_console_errors' => 'لم يتم تسجيل أخطاء في وحدة التحكم.',
+    'no_screenshots' => 'لا توجد لقطات شاشة مرفقة بهذه التذكرة.',
+    'screenshot_label' => 'لقطة :number',
+    'open_full_size' => 'فتح بالحجم الكامل',
 
     'messages' => [
         'invalid_transition' => 'تغيير الحالة الحالية إلى هذه الحالة غير مسموح.',

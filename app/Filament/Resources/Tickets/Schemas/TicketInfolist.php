@@ -3,14 +3,26 @@
 namespace App\Filament\Resources\Tickets\Schemas;
 
 use App\Models\Ticket;
-use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Storage;
 
 class TicketInfolist
 {
+    /**
+     * @return array<int, string>
+     */
+    private static function screenshotPaths(Ticket $record): array
+    {
+        return array_values(array_filter(
+            $record->attachments ?? [],
+            fn (string $path): bool => preg_match('/\.(png|jpe?g|webp)$/i', $path) === 1,
+        ));
+    }
+
     public static function configure(Schema $schema): Schema
     {
         return $schema
@@ -32,9 +44,6 @@ class TicketInfolist
                             TextEntry::make('assignee.name')
                                 ->label(__('filament/resources/tickets.fields.assignee'))
                                 ->placeholder(__('filament/resources/tickets.unassigned')),
-                            TextEntry::make('attachments_count')
-                                ->label(__('filament/resources/tickets.fields.attachments'))
-                                ->state(fn (Ticket $record): int => count($record->attachments ?? [])),
                         ]),
                         TextEntry::make('title')
                             ->label(__('filament/resources/tickets.fields.title'))
@@ -42,24 +51,50 @@ class TicketInfolist
                         TextEntry::make('description')
                             ->label(__('filament/resources/tickets.fields.description'))
                             ->columnSpanFull(),
-                        ImageEntry::make('screenshots')
-                            ->label(__('filament/resources/tickets.fields.attachments'))
-                            ->state(fn (Ticket $record): array => array_values(array_filter(
-                                $record->attachments ?? [],
-                                fn (string $path): bool => preg_match('/\.(png|jpe?g|webp)$/i', $path) === 1,
-                            )))
-                            ->disk('local')
-                            ->visibility('private')
-                            ->imageHeight(240)
-                            ->stacked()
-                            ->columnSpanFull(),
-                        TextEntry::make('page_url')
-                            ->label(__('filament/resources/tickets.fields.page_url'))
-                            ->url(fn (?string $state): ?string => $state)
-                            ->openUrlInNewTab()
-                            ->placeholder('—')
-                            ->columnSpanFull(),
                     ]),
+                Section::make(__('filament/resources/tickets.sections.browser'))
+                    ->schema([
+                        Grid::make(2)->schema([
+                            TextEntry::make('page_url')
+                                ->label(__('filament/resources/tickets.fields.page_url'))
+                                ->url(fn (?string $state): ?string => $state)
+                                ->openUrlInNewTab()
+                                ->placeholder('—')
+                                ->columnSpanFull(),
+                            TextEntry::make('viewport')
+                                ->label(__('filament/resources/tickets.fields.viewport'))
+                                ->state(fn (Ticket $record): ?string => $record->device_metadata['viewport'] ?? null)
+                                ->placeholder('—'),
+                            TextEntry::make('user_agent')
+                                ->label(__('filament/resources/tickets.fields.user_agent'))
+                                ->state(fn (Ticket $record): ?string => $record->device_metadata['user_agent'] ?? null)
+                                ->placeholder('—')
+                                ->columnSpanFull(),
+                            TextEntry::make('console_errors')
+                                ->label(__('filament/resources/tickets.fields.console_errors'))
+                                ->state(fn (Ticket $record): array => $record->device_metadata['console_errors'] ?? [])
+                                ->listWithLineBreaks()
+                                ->bulleted()
+                                ->placeholder(__('filament/resources/tickets.no_console_errors'))
+                                ->columnSpanFull(),
+                        ]),
+                    ]),
+                Section::make(fn (Ticket $record): string => __('filament/resources/tickets.sections.screenshots', ['count' => count(self::screenshotPaths($record))]))
+                    ->schema([
+                        ViewEntry::make('screenshots')
+                            ->hiddenLabel()
+                            ->view('filament.infolists.ticket-screenshots')
+                            ->viewData(fn (Ticket $record): array => [
+                                'shots' => collect(self::screenshotPaths($record))
+                                    ->map(fn (string $path, int $index): array => [
+                                        'url' => Storage::disk('local')->temporaryUrl($path, now()->addMinutes(30)),
+                                        'label' => __('filament/resources/tickets.screenshot_label', ['number' => $index + 1]),
+                                    ])
+                                    ->values()
+                                    ->all(),
+                            ]),
+                    ])
+                    ->collapsible(),
                 Section::make(__('filament/resources/tickets.sections.reporter'))
                     ->schema([
                         Grid::make(2)->schema([
