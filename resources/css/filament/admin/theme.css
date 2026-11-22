@@ -443,6 +443,11 @@
     color: #1e1b4b;
 }
 
+/* The login card stays light even when Filament applies the dark class from the OS setting. */
+.tms-login-page .tms-login-form label span {
+    color: #1e1b4b;
+}
+
 .tms-login-form .fi-input::placeholder {
     color: #8a82a8;
 }
