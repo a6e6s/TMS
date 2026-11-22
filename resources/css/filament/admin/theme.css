@@ -407,11 +407,10 @@
     text-decoration: none;
 }
 
-.tms-login-brand-mark {
-    width: 1.8rem;
-    height: 1.8rem;
-    border-radius: 0.5rem;
-    background: linear-gradient(145deg, #c4b5fd, #8b5cf6 65%, #6d28d9);
+.tms-login-brand-logo {
+    display: block;
+    height: clamp(2.5rem, 4vw, 3.5rem);
+    width: auto;
 }
 
 .tms-login-form-wrap {

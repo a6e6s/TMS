@@ -16,9 +16,8 @@
     </section>
 
     <section class="tms-login-panel" dir="{{ $loginDirection }}">
-        <a href="{{ filament()->getHomeUrl() ?: '/' }}" class="tms-login-brand" dir="ltr" aria-label="{{ __('filament/common.brand') }}">
-            <span class="tms-login-brand-mark" aria-hidden="true"></span>
-            <span dir="auto">{{ __('filament/common.brand') }}</span>
+        <a href="{{ filament()->getHomeUrl() ?: '/' }}" class="tms-login-brand" dir="ltr">
+            <img src="{{ asset('images/TMS.png') }}" alt="{{ __('filament/common.brand') }}" class="tms-login-brand-logo">
         </a>
 
         <div class="tms-login-form-wrap">
