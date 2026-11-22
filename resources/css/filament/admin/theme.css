@@ -96,20 +96,6 @@
     }
 }
 
-.fi-sidebar-header .fi-logo {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-}
-
-.fi-sidebar-header .fi-logo::before {
-    width: 1.55rem;
-    height: 1.55rem;
-    background: linear-gradient(145deg, #c4b5fd, #8b5cf6 65%, #6d28d9);
-    border-radius: 0.45rem;
-    content: '';
-    filter: drop-shadow(0 0 7px rgb(167 139 250 / 45%));
-}
 
 .fi-sidebar .fi-logo,
 .fi-sidebar .fi-sidebar-item-label,
