@@ -34,7 +34,6 @@ class AdminPanelProvider extends PanelProvider
             ->databaseNotifications()
             ->brandName(fn (): string => __('filament/common.brand'))
             ->brandLogo(asset('images/TMS.png'))
-            ->darkModeBrandLogo(asset('images/TMS-icon.png'))
             ->brandLogoHeight('4rem')
             ->favicon(asset('images/favicon-32x32.png'))
             ->colors([

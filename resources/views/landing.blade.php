@@ -25,8 +25,7 @@
         <header class="border-b border-slate-200 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-900/80">
             <nav class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
                 <a href="{{ url('/') }}" class="flex items-center gap-2 font-semibold">
-                    <img src="{{ asset('images/TMS.png') }}" alt="TMS" class="h-10 w-auto dark:hidden">
-                    <img src="{{ asset('images/TMS-icon.png') }}" alt="TMS" class="hidden h-10 w-auto dark:block">
+                    <img src="{{ asset('images/TMS.png') }}" alt="TMS" class="h-10 w-auto">
                 </a>
                 <div class="flex items-center gap-3 text-sm">
                     <a href="#features" class="hidden px-3 py-2 text-slate-600 hover:text-slate-900 sm:inline dark:text-slate-300 dark:hover:text-white">Features</a>
