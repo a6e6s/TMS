@@ -35,7 +35,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandName(fn (): string => __('filament/common.brand'))
             ->brandLogo(asset('images/TMS.png'))
             ->darkModeBrandLogo(asset('images/TMS-icon.png'))
-            ->brandLogoHeight('2.5rem')
+            ->brandLogoHeight('4rem')
             ->favicon(asset('images/favicon-32x32.png'))
             ->colors([
                 'primary' => Color::Violet,
