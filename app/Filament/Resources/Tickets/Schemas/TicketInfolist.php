@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Tickets\Schemas;
 
 use App\Models\Ticket;
+use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -40,6 +41,17 @@ class TicketInfolist
                             ->columnSpanFull(),
                         TextEntry::make('description')
                             ->label(__('filament/resources/tickets.fields.description'))
+                            ->columnSpanFull(),
+                        ImageEntry::make('screenshots')
+                            ->label(__('filament/resources/tickets.fields.attachments'))
+                            ->state(fn (Ticket $record): array => array_values(array_filter(
+                                $record->attachments ?? [],
+                                fn (string $path): bool => preg_match('/\.(png|jpe?g|webp)$/i', $path) === 1,
+                            )))
+                            ->disk('local')
+                            ->visibility('private')
+                            ->imageHeight(240)
+                            ->stacked()
                             ->columnSpanFull(),
                         TextEntry::make('page_url')
                             ->label(__('filament/resources/tickets.fields.page_url'))

@@ -5,6 +5,7 @@ use App\Models\SourceApp;
 use App\Models\Ticket;
 use App\Models\User;
 use App\Models\WebhookPayload;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 
 use function Pest\Laravel\postJson;
@@ -164,6 +165,22 @@ it('stores decoded screenshots on the private local disk', function () {
     expect($ticket->attachments)->toHaveCount(1);
     Storage::disk('local')->assertExists($ticket->attachments[0]);
     expect(str_ends_with($ticket->attachments[0], '.png'))->toBeTrue();
+});
+
+it('stores screenshots during intake without queueing any job', function () {
+    Storage::fake('local');
+    Queue::fake();
+    [, $token] = sourceAppWithToken();
+
+    $response = postJson('/api/v1/tickets', ticketPayload(), [
+        'Authorization' => 'Bearer '.$token,
+        'Idempotency-Key' => 'key-sync-shot',
+    ])->assertAccepted();
+
+    $ticket = Ticket::query()->where('ticket_number', $response->json('ticket_number'))->firstOrFail();
+
+    Queue::assertNothingPushed();
+    Storage::disk('local')->assertExists($ticket->attachments[0]);
 });
 
 it('ignores screenshots that are not real images', function () {

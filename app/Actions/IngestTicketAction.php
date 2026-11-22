@@ -7,11 +7,11 @@ use App\Enums\TicketSource;
 use App\Enums\TicketStatus;
 use App\Enums\WebhookProcessingStatus;
 use App\Exceptions\ApiProblemException;
-use App\Jobs\DecodeScreenshotsJob;
 use App\Models\SourceApp;
 use App\Models\Ticket;
 use App\Models\WebhookPayload;
 use App\Services\PayloadScrubber;
+use App\Services\TicketScreenshotStorer;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +23,7 @@ class IngestTicketAction
 
     public function __construct(
         private readonly PayloadScrubber $scrubber,
+        private readonly TicketScreenshotStorer $screenshots,
     ) {}
 
     /**
@@ -42,7 +43,14 @@ class IngestTicketAction
         $trackingToken = Str::random(40);
 
         try {
-            $ticket = DB::transaction(fn (): Ticket => $this->createTicket($sourceApp, $validated, $request, $scope, $idempotencyKey, $trackingToken));
+            $ticket = DB::transaction(function () use ($sourceApp, $validated, $request, $scope, $idempotencyKey, $trackingToken): Ticket {
+                $ticket = $this->createTicket($sourceApp, $validated, $request, $scope, $idempotencyKey, $trackingToken);
+
+                // Stored inside the transaction so a storage failure also rolls back the ticket and the idempotency key.
+                $this->screenshots->store($ticket, $validated['screenshots'] ?? []);
+
+                return $ticket;
+            });
         } catch (UniqueConstraintViolationException) {
             $existing = $this->recentPayload($scope, $idempotencyKey);
 
@@ -51,12 +59,6 @@ class IngestTicketAction
             }
 
             throw $this->conflict();
-        }
-
-        $screenshots = $validated['screenshots'] ?? [];
-
-        if ($screenshots !== []) {
-            DecodeScreenshotsJob::dispatch($ticket->id, $screenshots);
         }
 
         return ['ticket' => $ticket, 'tracking_token' => $trackingToken, 'duplicate' => false];
