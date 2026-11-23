@@ -7,6 +7,7 @@ use App\Enums\TicketSource;
 use App\Enums\TicketStatus;
 use App\Enums\WebhookProcessingStatus;
 use App\Exceptions\ApiProblemException;
+use App\Jobs\TriageTicketJob;
 use App\Models\SourceApp;
 use App\Models\Ticket;
 use App\Models\WebhookPayload;
@@ -60,6 +61,8 @@ class IngestTicketAction
 
             throw $this->conflict();
         }
+
+        TriageTicketJob::dispatch($ticket->getKey())->afterCommit();
 
         return ['ticket' => $ticket, 'tracking_token' => $trackingToken, 'duplicate' => false];
     }

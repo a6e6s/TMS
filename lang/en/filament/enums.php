@@ -15,6 +15,15 @@ return [
         'high' => 'High',
         'critical' => 'Critical',
     ],
+    'ticket_category' => [
+        'user_error' => 'User error',
+        'how_to' => 'How-to',
+        'bug' => 'Bug',
+        'feature_request' => 'Feature request',
+        'code_change' => 'Code change',
+        'config_or_infra' => 'Config / infrastructure',
+        'unclear' => 'Unclear',
+    ],
     'ticket_locale' => [
         'en' => 'English',
         'ar' => 'Arabic',

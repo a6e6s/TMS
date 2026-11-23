@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TicketCategory;
 use App\Enums\TicketLocale;
 use App\Enums\TicketPriority;
 use App\Enums\TicketSource;
@@ -42,6 +43,12 @@ use Illuminate\Validation\ValidationException;
     'attachments',
     'status',
     'priority',
+    'category',
+    'ai_priority',
+    'ai_confidence',
+    'ai_summary',
+    'ai_model',
+    'ai_classified_at',
 ])]
 class Ticket extends Model
 {
@@ -113,6 +120,10 @@ class Ticket extends Model
         return [
             'status' => TicketStatus::class,
             'priority' => TicketPriority::class,
+            'category' => TicketCategory::class,
+            'ai_priority' => TicketPriority::class,
+            'ai_confidence' => 'decimal:3',
+            'ai_classified_at' => 'datetime',
             'locale' => TicketLocale::class,
             'source' => TicketSource::class,
             'device_metadata' => 'array',

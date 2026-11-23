@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\TicketLocale;
+use App\Jobs\TriageTicketJob;
 use App\Models\SourceApp;
 use App\Models\Ticket;
 use App\Models\User;
@@ -203,7 +204,7 @@ it('stores decoded screenshots on the private local disk', function () {
     expect(str_ends_with($ticket->attachments[0], '.png'))->toBeTrue();
 });
 
-it('stores screenshots during intake without queueing any job', function () {
+it('stores screenshots during intake synchronously and only queues triage', function () {
     Storage::fake('local');
     Queue::fake();
     [, $token] = sourceAppWithToken();
@@ -215,7 +216,8 @@ it('stores screenshots during intake without queueing any job', function () {
 
     $ticket = Ticket::query()->where('ticket_number', $response->json('ticket_number'))->firstOrFail();
 
-    Queue::assertNothingPushed();
+    Queue::assertPushed(TriageTicketJob::class, 1);
+    Queue::assertCount(1);
     Storage::disk('local')->assertExists($ticket->attachments[0]);
 });
 

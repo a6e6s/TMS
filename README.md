@@ -11,6 +11,7 @@ TMS is a Laravel 13 and Filament 5 application that collects bug reports and sup
 - **Project management system (PMS) integration** that pushes tickets as tasks, with status sync through webhooks. Supported providers:
   - FlexFlow (`PMS_PROVIDER=flexflow`)
   - A generic HTTP provider (`PMS_PROVIDER=custom`)
+- **AI triage** (optional) classifies each new ticket by category (for example bug, feature request, or user error), suggests a priority, and writes a summary. It raises a ticket to `critical` only when the model is highly confident. Works with any OpenAI-compatible endpoint, such as NVIDIA NIM or OpenRouter.
 - **Roles and permissions** through `spatie/laravel-permission`, and a Filament admin panel.
 - **English and Arabic** interface.
 
@@ -55,6 +56,12 @@ Set these in `.env`. The full list is in [.env.example](.env.example).
 | `PMS_BASE_URL` | Base URL of the PMS API. For FlexFlow: `https://todo.3asry.com/api`. |
 | `PMS_API_TOKEN` | API key for the PMS. Keep it out of version control. |
 | `PMS_DEFAULT_PROJECT_ID` | Fallback PMS project when a source app has none. A source app's own project ID takes priority. |
+| `AI_TRIAGE_ENABLED` | Set to `true` to classify new tickets. Default is `false`. |
+| `AI_TRIAGE_BASE_URL` | OpenAI-compatible base URL, for example `https://integrate.api.nvidia.com/v1` or `https://openrouter.ai/api/v1`. |
+| `AI_TRIAGE_API_KEY` | API key for the AI provider. Keep it out of version control. |
+| `AI_TRIAGE_MODEL` | Model ID to use. Required when triage is enabled. |
+| `AI_TRIAGE_MIN_CONFIDENCE` | Results below this confidence are stored as unclear. Default is `0.5`. |
+| `AI_TRIAGE_AUTO_CRITICAL_MIN_CONFIDENCE` | Confidence needed before a `critical` suggestion is applied. Default is `0.85`. |
 
 ## Running the queue
 

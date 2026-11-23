@@ -66,7 +66,7 @@ class ActivitiesRelationManager extends RelationManager
 
         return match ($event) {
             'status_changed' => __('filament/enums.ticket_status.'.$value),
-            'priority_changed' => __('filament/enums.ticket_priority.'.$value),
+            'priority_changed', 'ai_priority_applied' => __('filament/enums.ticket_priority.'.$value),
             'assignee_changed' => User::query()->whereKey($value)->value('name') ?? (string) $value,
             default => (string) $value,
         };

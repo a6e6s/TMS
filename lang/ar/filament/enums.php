@@ -15,6 +15,15 @@ return [
         'high' => 'عالية',
         'critical' => 'حرجة',
     ],
+    'ticket_category' => [
+        'user_error' => 'خطأ من المستخدم',
+        'how_to' => 'طريقة استخدام',
+        'bug' => 'خلل',
+        'feature_request' => 'طلب ميزة',
+        'code_change' => 'تعديل برمجي',
+        'config_or_infra' => 'إعدادات / بنية تحتية',
+        'unclear' => 'غير واضحة',
+    ],
     'ticket_locale' => [
         'en' => 'الإنجليزية',
         'ar' => 'العربية',

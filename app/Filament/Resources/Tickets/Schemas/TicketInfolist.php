@@ -99,6 +99,35 @@ class TicketInfolist
                             ]),
                     ])
                     ->collapsible(),
+                Section::make(__('filament/resources/tickets.sections.ai'))
+                    ->schema([
+                        Grid::make(3)->schema([
+                            TextEntry::make('category')
+                                ->label(__('filament/resources/tickets.fields.category'))
+                                ->badge()
+                                ->placeholder(__('filament/resources/tickets.ai.unclassified')),
+                            TextEntry::make('ai_priority')
+                                ->label(__('filament/resources/tickets.fields.ai_priority'))
+                                ->badge()
+                                ->placeholder('—'),
+                            TextEntry::make('ai_confidence')
+                                ->label(__('filament/resources/tickets.fields.ai_confidence'))
+                                ->formatStateUsing(fn (?string $state): ?string => $state === null ? null : number_format((float) $state * 100).'%')
+                                ->placeholder('—'),
+                            TextEntry::make('ai_summary')
+                                ->label(__('filament/resources/tickets.fields.ai_summary'))
+                                ->placeholder('—')
+                                ->columnSpanFull(),
+                            TextEntry::make('ai_model')
+                                ->label(__('filament/resources/tickets.fields.ai_model'))
+                                ->placeholder('—'),
+                            TextEntry::make('ai_classified_at')
+                                ->label(__('filament/resources/tickets.fields.ai_classified_at'))
+                                ->dateTime()
+                                ->placeholder('—'),
+                        ]),
+                    ])
+                    ->collapsible(),
                 Section::make(__('filament/resources/tickets.sections.reporter'))
                     ->schema([
                         Grid::make(2)->schema([
