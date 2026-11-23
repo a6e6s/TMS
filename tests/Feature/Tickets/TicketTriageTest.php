@@ -130,3 +130,26 @@ it('never lowers a critical priority', function () {
 
     expect($ticket->fresh()->priority)->toBe(TicketPriority::Critical);
 });
+
+it('records an activity when the model returns no usable result', function () {
+    Http::fake([
+        'ai.test/*' => Http::response(['choices' => [['message' => ['content' => 'not json']]]]),
+    ]);
+
+    $ticket = Ticket::factory()->create();
+    TriageTicketJob::dispatchSync($ticket->getKey());
+
+    expect($ticket->refresh()->category)->toBe(TicketCategory::Unclear)
+        ->and(TicketActivity::query()->where('ticket_id', $ticket->getKey())->where('event', 'ai_triage_no_result')->exists())->toBeTrue();
+});
+
+it('records the error message when triage finally fails', function () {
+    $ticket = Ticket::factory()->create();
+
+    (new TriageTicketJob($ticket->getKey()))->failed(new RuntimeException('Provider timed out'));
+
+    expect(TicketActivity::query()
+        ->where('ticket_id', $ticket->getKey())
+        ->where('event', 'ai_triage_failed')
+        ->value('properties'))->toBe(['message' => 'Provider timed out']);
+});

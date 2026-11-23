@@ -105,6 +105,8 @@ return [
             'status_changed' => 'تم تغيير الحالة',
             'priority_changed' => 'تم تغيير الأولوية',
             'ai_priority_applied' => 'رفع الذكاء الاصطناعي الأولوية',
+            'ai_triage_no_result' => 'تعذّر على الذكاء الاصطناعي تصنيف التذكرة',
+            'ai_triage_failed' => 'فشل تصنيف الذكاء الاصطناعي',
             'assignee_changed' => 'تم تغيير المكلَّف',
         ],
     ],

@@ -12,6 +12,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Str;
 use Throwable;
 
 /**
@@ -51,6 +52,8 @@ class TriageTicketJob implements ShouldQueue
                 'ai_classified_at' => now(),
             ]);
 
+            TicketActivity::record($ticket, 'ai_triage_no_result');
+
             return;
         }
 
@@ -69,6 +72,14 @@ class TriageTicketJob implements ShouldQueue
     public function failed(Throwable $exception): void
     {
         report($exception);
+
+        $ticket = Ticket::query()->find($this->ticketId);
+
+        if ($ticket !== null) {
+            TicketActivity::record($ticket, 'ai_triage_failed', [
+                'message' => Str::limit($exception->getMessage(), 500),
+            ]);
+        }
     }
 
     private function raiseToCriticalIfConfident(Ticket $ticket, TicketPriority $aiPriority, float $confidence): void

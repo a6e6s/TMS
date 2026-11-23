@@ -48,6 +48,10 @@ class ActivitiesRelationManager extends RelationManager
     {
         $properties = $record->properties ?? [];
 
+        if ($record->event === 'ai_triage_failed') {
+            return $properties['message'] ?? null;
+        }
+
         if ($properties === []) {
             return null;
         }

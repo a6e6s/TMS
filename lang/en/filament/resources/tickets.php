@@ -105,6 +105,8 @@ return [
             'status_changed' => 'Status changed',
             'priority_changed' => 'Priority changed',
             'ai_priority_applied' => 'AI raised priority',
+            'ai_triage_no_result' => 'AI could not classify',
+            'ai_triage_failed' => 'AI triage failed',
             'assignee_changed' => 'Assignee changed',
         ],
     ],
