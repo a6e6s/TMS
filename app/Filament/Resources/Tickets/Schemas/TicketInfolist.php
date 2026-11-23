@@ -8,7 +8,7 @@ use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 
 class TicketInfolist
 {
@@ -87,7 +87,11 @@ class TicketInfolist
                             ->viewData(fn (Ticket $record): array => [
                                 'shots' => collect(self::screenshotPaths($record))
                                     ->map(fn (string $path, int $index): array => [
-                                        'url' => Storage::disk('local')->temporaryUrl($path, now()->addMinutes(30)),
+                                        'url' => URL::temporarySignedRoute(
+                                            'tickets.screenshot',
+                                            now()->addMinutes(30),
+                                            ['ticket' => $record->getKey(), 'screenshot' => pathinfo($path, PATHINFO_FILENAME)],
+                                        ),
                                         'label' => __('filament/resources/tickets.screenshot_label', ['number' => $index + 1]),
                                     ])
                                     ->values()
