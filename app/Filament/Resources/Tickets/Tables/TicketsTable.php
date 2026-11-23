@@ -52,6 +52,11 @@ class TicketsTable
                     ->badge()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->placeholder('—'),
+                TextColumn::make('sourceApp.name')
+                    ->label(__('filament/resources/tickets.fields.source_app'))
+                    ->badge()
+                    ->sortable()
+                    ->placeholder('—'),
                 TextColumn::make('locale')
                     ->label(__('filament/resources/tickets.fields.locale'))
                     ->badge(),
@@ -78,8 +83,8 @@ class TicketsTable
                 TrashedFilter::make(),
             ])
             ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
+                ViewAction::make()->iconButton(),
+                EditAction::make()->iconButton(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

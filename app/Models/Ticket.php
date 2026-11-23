@@ -47,6 +47,7 @@ use Illuminate\Validation\ValidationException;
     'ai_priority',
     'ai_confidence',
     'ai_summary',
+    'ai_summary_ar',
     'ai_model',
     'ai_classified_at',
 ])]

@@ -61,7 +61,8 @@ class TriageTicketJob implements ShouldQueue
             'category' => $result['category'],
             'ai_priority' => $result['ai_priority'],
             'ai_confidence' => $result['confidence'],
-            'ai_summary' => $result['summary'],
+            'ai_summary' => $result['summary_en'],
+            'ai_summary_ar' => $result['summary_ar'] ?: null,
             'ai_model' => $result['model'],
             'ai_classified_at' => now(),
         ]);

@@ -118,6 +118,11 @@ class TicketInfolist
                                 ->label(__('filament/resources/tickets.fields.ai_summary'))
                                 ->placeholder('—')
                                 ->columnSpanFull(),
+                            TextEntry::make('ai_summary_ar')
+                                ->label(__('filament/resources/tickets.fields.ai_summary_ar'))
+                                ->placeholder('—')
+                                ->extraAttributes(['dir' => 'rtl'])
+                                ->columnSpanFull(),
                             TextEntry::make('ai_model')
                                 ->label(__('filament/resources/tickets.fields.ai_model'))
                                 ->placeholder('—'),

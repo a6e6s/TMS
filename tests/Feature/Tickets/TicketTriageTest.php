@@ -66,7 +66,8 @@ it('stores the classification without changing the reported priority', function 
         'category' => 'how_to',
         'suggested_priority' => 'low',
         'confidence' => 0.95,
-        'summary' => 'User asks how to export a report.',
+        'summary_en' => 'User asks how to export a report.',
+        'summary_ar' => 'يسأل المستخدم كيفية تصدير التقرير.',
     ]);
 
     $ticket = Ticket::factory()->create(['priority' => TicketPriority::Medium]);
@@ -75,6 +76,8 @@ it('stores the classification without changing the reported priority', function 
     $ticket->refresh();
 
     expect($ticket->category)->toBe(TicketCategory::HowTo)
+        ->and($ticket->ai_summary)->toBe('User asks how to export a report.')
+        ->and($ticket->ai_summary_ar)->toBe('يسأل المستخدم كيفية تصدير التقرير.')
         ->and($ticket->ai_priority)->toBe(TicketPriority::Low)
         ->and($ticket->ai_model)->toBe('test-model')
         ->and($ticket->ai_classified_at)->not->toBeNull()
@@ -86,7 +89,8 @@ it('raises to critical only when the model is highly confident and logs it', fun
         'category' => 'bug',
         'suggested_priority' => 'critical',
         'confidence' => 0.92,
-        'summary' => 'Payments fail for all users.',
+        'summary_en' => 'Payments fail for all users.',
+        'summary_ar' => 'فشل الدفع لجميع المستخدمين.',
     ]);
 
     $ticket = Ticket::factory()->create(['priority' => TicketPriority::Medium]);
@@ -107,7 +111,8 @@ it('keeps the reported priority when critical confidence is below the auto-raise
         'category' => 'bug',
         'suggested_priority' => 'critical',
         'confidence' => 0.6,
-        'summary' => 'Possibly an outage.',
+        'summary_en' => 'Possibly an outage.',
+        'summary_ar' => 'ربما يكون هناك انقطاع في الخدمة.',
     ]);
 
     $ticket = Ticket::factory()->create(['priority' => TicketPriority::Medium]);
@@ -122,7 +127,8 @@ it('never lowers a critical priority', function () {
         'category' => 'how_to',
         'suggested_priority' => 'low',
         'confidence' => 0.99,
-        'summary' => 'Question.',
+        'summary_en' => 'Question.',
+        'summary_ar' => 'سؤال.',
     ]);
 
     $ticket = Ticket::factory()->create(['priority' => TicketPriority::Critical]);
