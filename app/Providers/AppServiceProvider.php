@@ -21,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(PmsConnectorInterface::class, fn () => match (config('pms.default_provider')) {
+        $this->app->bind(PmsConnectorInterface::class, fn () => match (strtolower((string) config('pms.default_provider'))) {
             'flexflow' => new FlexFlowPmsConnector,
             default => new GenericHttpPmsConnector,
         });

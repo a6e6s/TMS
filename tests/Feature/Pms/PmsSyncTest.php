@@ -8,6 +8,7 @@ use App\Models\ProjectSync;
 use App\Models\Ticket;
 use App\Models\User;
 use App\Notifications\PmsSyncFailedNotification;
+use App\Services\Pms\FlexFlowPmsConnector;
 use App\Services\Pms\PmsConnectorInterface;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
@@ -132,3 +133,9 @@ it('shows a failed PMS sync and its last error on the ticket page', function () 
     Livewire::test(ViewTicket::class, ['record' => $ticket->getRouteKey()])
         ->assertSee('PMS returned HTTP 503');
 });
+
+it('resolves the FlexFlow connector regardless of the configured provider name case', function (string $provider) {
+    config(['pms.default_provider' => $provider]);
+
+    expect(app(PmsConnectorInterface::class))->toBeInstanceOf(FlexFlowPmsConnector::class);
+})->with(['flexflow', 'FlexFlow']);
