@@ -42,6 +42,7 @@ PROMPT;
             'model' => $model,
             'temperature' => 0,
             'max_tokens' => 300,
+            'chat_template_kwargs' => ['enable_thinking' => false],
             'messages' => [
                 ['role' => 'system', 'content' => self::SYSTEM_PROMPT],
                 ['role' => 'user', 'content' => $this->userMessage($ticket)],
