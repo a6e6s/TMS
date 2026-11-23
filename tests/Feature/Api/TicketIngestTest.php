@@ -61,9 +61,25 @@ it('creates a ticket and returns a one-time tracking token', function () {
 
     expect($ticket->source->value)->toBe('api')
         ->and($ticket->locale)->toBe(TicketLocale::Arabic)
-        ->and($ticket->priority->value)->toBe('medium')
+        ->and($ticket->priority->value)->toBe('high')
         ->and($ticket->tracking_token_hash)->toBe(hash('sha256', $response->json('tracking_token')))
         ->and($ticket->reporter_email)->toBe('sara@client.com');
+});
+
+it('defaults the priority to medium when the caller omits it', function () {
+    Storage::fake('local');
+    [, $token] = sourceAppWithToken();
+
+    $response = postJson('/api/v1/tickets', ticketPayload(['priority' => null]), [
+        'Authorization' => 'Bearer '.$token,
+        'Idempotency-Key' => 'key-no-priority',
+    ]);
+
+    $response->assertAccepted();
+
+    $ticket = Ticket::query()->where('ticket_number', $response->json('ticket_number'))->firstOrFail();
+
+    expect($ticket->priority->value)->toBe('medium');
 });
 
 it('keeps the reporter browser user agent and viewport on the ticket', function () {

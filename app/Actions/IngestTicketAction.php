@@ -118,7 +118,7 @@ class IngestTicketAction
             'page_url' => $this->scrubber->scrubUrl($validated['page_url'] ?? null),
             'device_metadata' => $deviceMetadata,
             'status' => TicketStatus::Open,
-            'priority' => TicketPriority::Medium,
+            'priority' => TicketPriority::from($validated['priority'] ?? TicketPriority::Medium->value),
             'tracking_token_hash' => hash('sha256', $trackingToken),
         ]);
 
