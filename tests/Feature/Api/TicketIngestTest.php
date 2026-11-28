@@ -103,6 +103,68 @@ it('keeps the reporter browser user agent and viewport on the ticket', function 
         ->toHaveKey('viewport', '1440x900');
 });
 
+it('stores the signed-in user, platform and tenant metadata on the ticket', function () {
+    Storage::fake('local');
+    [, $token] = sourceAppWithToken();
+
+    $response = postJson('/api/v1/tickets', ticketPayload([
+        'device_metadata' => [
+            'user_id' => '7',
+            'platform' => 'Jit HR',
+            'panel' => 'app',
+            'os' => 'Windows',
+            'browser' => 'Chrome',
+            'tenant' => ['id' => '12', 'name' => 'Acme Clinics'],
+        ],
+    ]), [
+        'Authorization' => 'Bearer '.$token,
+        'Idempotency-Key' => 'key-context',
+    ]);
+
+    $response->assertAccepted();
+
+    $ticket = Ticket::query()->where('ticket_number', $response->json('ticket_number'))->firstOrFail();
+
+    expect($ticket->device_metadata)
+        ->toHaveKey('user_id', '7')
+        ->toHaveKey('platform', 'Jit HR')
+        ->toHaveKey('os', 'Windows')
+        ->toHaveKey('browser', 'Chrome')
+        ->and($ticket->device_metadata['tenant'])->toBe(['id' => '12', 'name' => 'Acme Clinics']);
+});
+
+it('accepts tickets from systems without tenants', function () {
+    Storage::fake('local');
+    [, $token] = sourceAppWithToken();
+
+    $response = postJson('/api/v1/tickets', ticketPayload([
+        'device_metadata' => ['user_id' => '7', 'platform' => 'Jit HR'],
+    ]), [
+        'Authorization' => 'Bearer '.$token,
+        'Idempotency-Key' => 'key-no-tenant',
+    ]);
+
+    $response->assertAccepted();
+
+    $ticket = Ticket::query()->where('ticket_number', $response->json('ticket_number'))->firstOrFail();
+
+    expect($ticket->device_metadata)
+        ->toHaveKey('user_id', '7')
+        ->not->toHaveKey('tenant');
+});
+
+it('rejects a non-string user id and a tenant without an id', function () {
+    [, $token] = sourceAppWithToken();
+
+    postJson('/api/v1/tickets', ticketPayload([
+        'device_metadata' => ['user_id' => ['7'], 'tenant' => ['name' => 'Acme Clinics']],
+    ]), [
+        'Authorization' => 'Bearer '.$token,
+        'Idempotency-Key' => 'key-bad-context',
+    ])->assertUnprocessable()
+        ->assertJsonValidationErrors(['device_metadata.user_id', 'device_metadata.tenant.id']);
+});
+
 it('returns the original ticket for a repeated Idempotency-Key without creating another', function () {
     Storage::fake('local');
     [, $token] = sourceAppWithToken();

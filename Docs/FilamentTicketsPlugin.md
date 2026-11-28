@@ -23,7 +23,7 @@ Build a Composer package in its own folder at `/home/a6e6s/Code/filament-tms-tic
 
 * `composer.json`: requires `filament/filament ^5.0`, `illuminate/support`, and `php ^8.3`. Auto-discovers the service provider.
 * `src/FilamentTicketsPlugin.php`: implements `Filament\Contracts\Plugin`. Registers the action in the panel's header. Each panel opts in with `->plugins([FilamentTicketsPlugin::make()])`, so multi-panel projects such as `jit-hr` enable it only on chosen panels.
-* `src/Actions/CreateTicketAction.php`: Filament action with a modal form. Pre-fills `page_url` from the current request. Fills `device_metadata` from a small Alpine snippet (user agent, viewport, console errors buffered from `window.onerror`).
+* `src/Actions/CreateTicketAction.php`: Filament action with a modal form. Pre-fills `page_url` from the current request. Fills `device_metadata` from a small Alpine snippet (user agent, viewport, console errors buffered from `window.onerror`). The server adds `user_id`, `panel`, `platform`, `os`, `browser`, and `tenant` (`id` and `name`, only for panels with tenancy) through `src/Services/TicketContext.php`.
 * `src/Services/TmsTicketClient.php`: `Http::withToken()->acceptJson()->timeout()->post()`. Sends a UUID v4 `Idempotency-Key` per submission. Maps the 202 response to a `ticket_number` notification. Maps 422 to form field errors, and 401, 413, 429, and 5xx to user-facing messages.
 * `src/Services/ScreenshotEncoder.php`: converts uploaded files to `data:image/*;base64,` URIs. Enforces a limit of 5 files and 2 MB per file, and checks MIME type by content sniffing.
 * `config/tms-tickets.php`: `url`, `token`, `timeout`, `enabled`. Values come from `TMS_TICKETS_URL` and `TMS_TICKETS_TOKEN` in the host `.env`.
@@ -42,7 +42,7 @@ Build a Composer package in its own folder at `/home/a6e6s/Code/filament-tms-tic
 * **Timeouts:** The HTTP call runs synchronously in the action with a short timeout (for example, 10 s). The TMS queues screenshot decoding, so the 202 response is fast.
 * **Errors:** A 422 shows field-level errors in the form. Network or 5xx errors keep the modal open and show a retry message.
 * **Security:** The token is read from `config` only. It is never rendered into the page or logged. Device metadata is sent only after the user submits, not on modal open.
-* **Privacy:** The form tells the user what metadata is captured. Console errors are truncated to 1,000 characters per entry, with at most 50 entries, as the API requires.
+* **Privacy:** The form tells the user what metadata is captured. Console errors are truncated to 1,000 characters per entry, with at most 50 entries, as the API requires. The signed-in user's ID (not the session ID), the panel, the platform name, the OS and browser parsed from the user agent, and the current tenant's ID and name are sent. Tenant fields are omitted for systems without tenancy.
 
 ## Testing
 
